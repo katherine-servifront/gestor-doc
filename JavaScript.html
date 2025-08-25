@@ -1,0 +1,352 @@
+<script>
+    // Mapa de procesos por país
+    const procesosMigratorios = {
+        "Alemania": "INGENIUM",
+        "España": "IBERICA 360",
+        "Estados Unidos": "EB2-NIW"
+    };
+
+    // Espera a que el DOM esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function ()
+    {
+
+        // Asignar proceso migratorio basado en el país
+        document.getElementById('pais').addEventListener('change', function ()
+        {
+            const paisSeleccionado = this.value;
+            const procesoInput = document.getElementById('proceso');
+            procesoInput.value = procesosMigratorios[paisSeleccionado] || '';
+        });
+
+        // Mostrar/ocultar campos del cónyuge
+        document.getElementById('estadoCivil').addEventListener('change', function ()
+        {
+            const conyugeDocs = document.getElementById('coyuge-docs');
+            const esCasado = this.value === 'Casado';
+            conyugeDocs.style.display = esCasado ? 'block' : 'none';
+            // Hacer los campos requeridos solo si son visibles
+            document.getElementById('actaMatrimonio').required = esCasado;
+            document.getElementById('conyugePartidaNacimiento').required = esCasado;
+            document.getElementById('conyugePasaporte').required = esCasado;
+        });
+
+        // Mostrar/ocultar sección de hijos
+        document.getElementById('tieneHijos').addEventListener('change', function ()
+        {
+            const hijosSection = document.getElementById('hijos-section');
+            const tieneHijos = this.value === 'Si';
+            hijosSection.style.display = tieneHijos ? 'block' : 'none';
+
+            // Si se selecciona "Sí" y no hay hijos, agregar uno automáticamente
+            if (tieneHijos && document.getElementById('hijos-table').querySelector('tbody').rows.length === 0)
+            {
+                addHijo();
+            }
+        });
+
+        // Botón para agregar una nueva fila de hijo
+        document.getElementById('add-hijo-btn').addEventListener('click', addHijo);
+
+        // Manejo del envío del formulario
+        document.getElementById('uploadForm').addEventListener('submit', handleFormSubmit);
+    });
+
+    /**
+     * @description Agrega una nueva fila a la tabla de hijos.
+     */
+    function addHijo()
+    {
+        const tableBody = document.getElementById('hijos-table').querySelector('tbody');
+        const template = document.getElementById('hijo-template');
+        const newRow = template.cloneNode(true);
+        newRow.removeAttribute('id'); // Quitar el id de la plantilla
+        tableBody.appendChild(newRow);
+    }
+
+    /**
+     * @description Elimina la fila de un hijo.
+     * @param {HTMLButtonElement} btn - El botón "Eliminar" que fue presionado.
+     */
+    function removeHijo(btn)
+    {
+        const row = btn.closest('tr');
+        row.parentNode.removeChild(row);
+    }
+
+    /**
+           * @description Valida un único campo de tipo 'file'.
+           * @param {HTMLInputElement} fileInput - El campo de archivo a validar.
+           * @returns {string|null} - Devuelve un mensaje de error si es inválido, o null si es válido.
+           */
+    function validateFileInput(fileInput)
+    {
+        const allowedExtensions = ['pdf', 'png', 'jpg', 'jpeg'];
+        // 10 MB = 10 * 1024 KB * 1024 Bytes = 10485760 Bytes
+        const maxSizeInBytes = 10 * 1024 * 1024;
+        const file = fileInput.files[0];
+        const label = document.querySelector(`label[for='${fileInput.id}']`)?.textContent || fileInput.name;
+
+        // 1. Validar si es requerido y está vacío
+        if (fileInput.required && !file)
+        {
+            return `El campo "${label}" es obligatorio.`;
+        }
+
+        // 2. Si hay un archivo (incluso en campos opcionales), validar su extensión
+        if (file)
+        {
+            const fileName = file.name;
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+
+            if (!allowedExtensions.includes(fileExtension))
+            {
+                return `El archivo "${fileName}" en el campo "${label}" tiene un formato no permitido. Solo se aceptan: ${allowedExtensions.join(', ')}.`;
+            }
+            // --- Validación del tamaño del archivo ---
+            if (file.size > maxSizeInBytes)
+            {
+                // Calculamos el tamaño del archivo en MB para mostrar un mensaje más amigable
+                const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                return `El archivo "${fileName}" (${fileSizeInMB} MB) excede el tamaño máximo permitido de 10 MB.`;
+            }
+        }
+
+        // Si pasa todas las validaciones, no hay error.
+        return null;
+    }
+
+    /**
+     * @description Orquesta la validación de todo el formulario.
+     * @returns {boolean} - Devuelve true si el formulario es válido, false en caso contrario.
+     */
+    function validateForm()
+    {
+        const errors = [];
+
+        // 1. Validar la política de datos
+        if (!document.getElementById('aceptoPoliticas').checked)
+        {
+            errors.push("Debe aceptar las políticas de tratamiento de datos para continuar.");
+        }
+
+        // 2. Validar TODOS los campos de tipo 'file' del formulario, incluyendo los dinámicos
+        const allFileInputs = document.querySelectorAll('#uploadForm input[type="file"]');
+
+        allFileInputs.forEach(input =>
+        {
+            // Solo validar campos que están visibles
+            // .offsetParent es null si el elemento o uno de sus ancestros tiene display: none
+            if (input.offsetParent !== null)
+            {
+                const error = validateFileInput(input);
+                if (error)
+                {
+                    errors.push(error);
+                }
+            }
+        });
+
+        // 3. Mostrar errores si existen
+        if (errors.length > 0)
+        {
+            // Unimos todos los errores en un solo mensaje
+            alert("Por favor, corrija los siguientes errores:\n\n- " + errors.join("\n- "));
+            return false; // El formulario NO es válido
+        }
+
+        return true; // El formulario es válido
+    }
+
+    /**
+     * @description Maneja el evento de envío del formulario.
+     */
+    function handleFormSubmit(event)
+    {
+        event.preventDefault();
+
+        if (!validateForm())
+        {
+            // Si la validación falla, detenemos todo el proceso aquí.
+            return;
+
+        }
+
+        // =======================================================
+        //        INICIO: VALIDACIÓN DE POLÍTICAS DE DATOS
+        // =======================================================
+        const checkboxPoliticas = document.getElementById('aceptoPoliticas');
+        const errorPoliticasDiv = document.getElementById('error-politicas');
+
+        // Limpiar cualquier mensaje de error previo
+        errorPoliticasDiv.textContent = '';
+
+        // Verificar si la casilla está marcada
+        if (!checkboxPoliticas.checked)
+        {
+            // Si no está marcada, mostrar error y detener el envío
+            errorPoliticasDiv.textContent = "Debe aceptar las políticas para poder enviar el formulario.";
+            return; // Detiene la ejecución de la función aquí
+        }
+        // =======================================================
+        //          FIN: VALIDACIÓN DE POLÍTICAS DE DATOS
+        // =======================================================
+
+        const statusDiv = document.getElementById('status');
+        const submitBtn = document.getElementById('submit-btn');
+
+        statusDiv.innerHTML = "Procesando, por favor espere... ⏳";
+        statusDiv.className = 'status processing';
+        submitBtn.disabled = true;
+
+        const form = event.target;
+        const formObject = {
+            // Recolectar datos de texto
+            pais: form.pais.value,
+            proceso: form.proceso.value,
+            tipoId: form.tipoId.value,
+            numeroId: form.numeroId.value,
+            nombreCompleto: form.nombreCompleto.value,
+            estadoCivil: form.estadoCivil.value,
+            // Los archivos se agregarán después
+        };
+
+        const filePromises = [];
+
+        // Función para leer un archivo y agregarlo a las promesas
+        const readFileAsBase64 = (input, objectKey) =>
+        {
+            if (input && input.files[0])
+            {
+                const file = input.files[0];
+                const promise = new Promise((resolve) =>
+                {
+                    const reader = new FileReader();
+                    reader.onload = (e) =>
+                    {
+                        resolve({
+                            key: objectKey,
+                            value: {
+                                fileName: file.name,
+                                mimeType: file.type,
+                                data: e.target.result.split(',')[1] // Solo la data base64
+                            }
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                });
+                filePromises.push(promise);
+            }
+        };
+
+        // Lectura de archivos del titular y cónyuge
+        readFileAsBase64(form.partidaNacimiento, 'partidaNacimiento');
+        readFileAsBase64(form.pasaporte, 'pasaporte');
+        readFileAsBase64(form.visa, 'visa');
+        readFileAsBase64(form.diploma, 'diploma');
+        readFileAsBase64(form.actaGrado, 'actaGrado');
+        readFileAsBase64(form.notas, 'notas');
+
+        if (form.estadoCivil.value === 'Casado')
+        {
+            readFileAsBase64(form.actaMatrimonio, 'actaMatrimonio');
+            readFileAsBase64(form.conyugePartidaNacimiento, 'conyugePartidaNacimiento');
+            readFileAsBase64(form.conyugePasaporte, 'conyugePasaporte');
+            readFileAsBase64(form.conyugeVisa, 'conyugeVisa');
+        }
+
+        // Lectura de archivos de los hijos
+        const hijosRows = document.getElementById('hijos-table').querySelector('tbody').rows;
+        const hijosDataPromises = [];
+
+        for (let i = 0; i < hijosRows.length; i++)
+        {
+            const row = hijosRows[i];
+            const hijoNombre = row.querySelector('.hijo-nombre').value;
+            if (!hijoNombre) continue; // Ignorar filas sin nombre
+
+            const hijoFiles = {
+                nombre: hijoNombre
+            };
+
+            const hijoFilePromises = [];
+
+            const readChildFile = (input, key) =>
+            {
+                if (input && input.files[0])
+                {
+                    const file = input.files[0];
+                    const promise = new Promise((resolve) =>
+                    {
+                        const reader = new FileReader();
+                        reader.onload = (e) =>
+                        {
+                            hijoFiles[key] = {
+                                fileName: file.name,
+                                mimeType: file.type,
+                                data: e.target.result.split(',')[1]
+                            };
+                            resolve();
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    hijoFilePromises.push(promise);
+                }
+            };
+
+            readChildFile(row.querySelector('[name="hijoPartidaNacimiento"]'), 'partidaNacimiento');
+            readChildFile(row.querySelector('[name="hijoPasaporte"]'), 'pasaporte');
+            readChildFile(row.querySelector('[name="hijoVisa"]'), 'visa');
+
+            // Promesa que se resuelve cuando todos los archivos de un hijo están leídos
+            const hijoPromise = Promise.all(hijoFilePromises).then(() => hijoFiles);
+            hijosDataPromises.push(hijoPromise);
+        }
+
+        // Esperar a que se lean todos los archivos
+        Promise.all([...filePromises, ...hijosDataPromises]).then(results =>
+        {
+            // Procesar resultados de archivos del titular/cónyuge
+            results.forEach(result =>
+            {
+                if (result && result.key)
+                {
+                    formObject[result.key] = result.value;
+                }
+            });
+            // Procesar resultados de archivos de hijos
+            formObject.hijos = results.filter(r => r && !r.key);
+
+            // Enviar el objeto completo al servidor
+            google.script.run
+                .withSuccessHandler(onSuccess)
+                .withFailureHandler(onFailure)
+                .processForm(formObject);
+        });
+    }
+
+    /**
+     * @description Se ejecuta cuando el servidor responde con éxito.
+     * @param {string} message - El mensaje de éxito del servidor.
+     */
+    function onSuccess(message)
+    {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerHTML = `${message}`;
+        statusDiv.className = 'status success';
+        //setTimeout(() => {
+        //location.reload(); // Refrescar la página
+        //}, 2000);
+    }
+
+    /**
+     * @description Se ejecuta cuando el servidor responde con un error.
+     * @param {Error} error - El objeto de error.
+     */
+    function onFailure(error)
+    {
+        const statusDiv = document.getElementById('status');
+        statusDiv.innerHTML = `Error: ${error.message}`;
+        statusDiv.className = 'status error';
+        document.getElementById('submit-btn').disabled = false;
+    }
+</script>

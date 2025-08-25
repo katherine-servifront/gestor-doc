@@ -1,0 +1,214 @@
+<style>
+    :root {
+        --primary-color: #4a90e2;
+        --secondary-color: #f5f7fa;
+        --text-color: #333;
+        --border-color: #d1d5db;
+        --success-color: #28a745;
+        --error-color: #dc3545;
+        --processing-color: #ffc107;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        margin: 0;
+        padding: 20px;
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--primary-color);
+        padding-bottom: 10px;
+        margin-top: 0;
+    }
+
+    fieldset {
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    legend {
+        font-weight: bold;
+        color: var(--primary-color);
+        padding: 0 10px;
+    }
+
+    .form-row {
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        box-sizing: border-box;
+        transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+
+    input[type="text"][readonly] {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+    }
+
+    button {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.2s;
+    }
+
+    button:hover {
+        background-color: #357ABD;
+    }
+
+    button:disabled {
+        background-color: #a0c3e8;
+        cursor: not-allowed;
+    }
+
+    .hidden-section {
+        display: none;
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border: 1px dashed var(--border-color);
+        border-radius: 4px;
+    }
+
+    #hijos-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+    }
+
+    #hijos-table th,
+    #hijos-table td {
+        border: 1px solid var(--border-color);
+        padding: 8px;
+        text-align: left;
+    }
+
+    #hijos-table th {
+        background-color: #e9ecef;
+    }
+
+    .remove-hijo-btn {
+        background-color: #e74c3c;
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+
+    .remove-hijo-btn:hover {
+        background-color: #c0392b;
+    }
+
+    #status {
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+        display: none;
+        /* Oculto por defecto */
+    }
+
+    #status.processing {
+        display: block;
+        background-color: var(--processing-color);
+        color: #333;
+    }
+
+    #status.success {
+        display: block;
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    #status.error {
+        display: block;
+        background-color: var(--error-color);
+        color: white;
+    }
+
+    /* ======================================================= */
+    /* ESTILOS PARA LA SECCIÓN DE POLÍTICAS DE DATOS     */
+    /* ======================================================= */
+    .politicas-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        /* Espacio antes del botón o mensaje de error */
+        font-size: 14px;
+    }
+
+    .politicas-container input[type="checkbox"] {
+        width: 18px;
+        /* Hacemos el checkbox un poco más grande */
+        height: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+    .politicas-container label {
+        margin-bottom: 0;
+        /* Reseteamos el margen de la etiqueta general */
+        cursor: pointer;
+    }
+
+    .politicas-container a {
+        color: var(--primary-color);
+        /* Usamos el color primario del tema */
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .politicas-container a:hover {
+        text-decoration: underline;
+    }
+
+    .error-mensaje {
+        color: var(--error-color);
+        /* Usamos el color de error del tema */
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        /* Espacio antes del botón de envío */
+        height: 1em;
+        /* Altura para evitar que el layout salte */
+    }
+</style>

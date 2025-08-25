@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+    <?!= include('CSS'); ?>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Formulario de Gestión Documental</h1>
+        <p>Complete todos los campos requeridos y adjunte los documentos solicitados.</p>
+
+        <form id="uploadForm">
+            <fieldset>
+                <legend>Datos Generales</legend>
+                <div class="form-row">
+                    <label for="pais">País de Destino</label>
+                    <select id="pais"
+                            name="pais"
+                            required>
+                        <option value=""
+                                disabled
+                                selected>Seleccione un país</option>
+                        <option value="Estados Unidos">Estados Unidos</option>
+                        <option value="España">España</option>
+                        <option value="Alemania">Alemania</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="proceso">Proceso de Migración</label>
+                    <input type="text"
+                           id="proceso"
+                           name="proceso"
+                           readonly>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Información del Titular</legend>
+                <div class="form-row">
+                    <label for="tipoId">Tipo de Identificación</label>
+                    <select id="tipoId"
+                            name="tipoId"
+                            required>
+                        <option value="Cédula de Ciudadanía">Cédula de Ciudadanía</option>
+                        <option value="Pasaporte">Pasaporte</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label for="numeroId">Número de Identificación</label>
+                    <input type="text"
+                           id="numeroId"
+                           name="numeroId"
+                           pattern="[A-Za-z0-9]+"
+                           title="Solo se permiten letras y números, sin espacios ni caracteres especiales."
+                           minlength="4"
+                           maxlength="12"
+                           required>
+                </div>
+                <div class="form-row">
+                    <label for="nombreCompleto">Nombre Completo</label>
+                    <input type="text"
+                           id="nombreCompleto"
+                           name="nombreCompleto"
+                           pattern="[A-Za-z\s]+"
+                           title="No se permiten caracteres especiales ni números."
+                           required>
+                </div>
+                <div class="form-row file-input">
+                    <label for="partidaNacimiento">Partida de Nacimiento (Requerido)</label>
+                    <input type="file"
+                           id="partidaNacimiento"
+                           name="partidaNacimiento"
+                           accept="application/pdf, image/png, image/jpeg"
+                           required>
+                </div>
+                <div class="form-row file-input">
+                    <label for="pasaporte">Pasaporte (Requerido)</label>
+                    <input type="file"
+                           id="pasaporte"
+                           name="pasaporte"
+                           accept="application/pdf, image/png, image/jpeg"
+                           required>
+                </div>
+                <div class="form-row file-input">
+                    <label for="visa">Visa (Opc.)</label>
+                    <input type="file"
+                           id="visa"
+                           name="visa"
+                           accept="application/pdf, image/png, image/jpeg">
+                </div>
+                <h4>Documentos Académicos</h4>
+                <div class="form-row file-input">
+                    <label for="diploma">Diploma (Opc.)</label>
+                    <input type="file"
+                           id="diploma"
+                           name="diploma"
+                           accept="application/pdf, image/png, image/jpeg">
+                </div>
+                <div class="form-row file-input">
+                    <label for="actaGrado">Acta de Grado (Opc.)</label>
+                    <input type="file"
+                           id="actaGrado"
+                           name="actaGrado"
+                           accept="application/pdf, image/png, image/jpeg">
+                </div>
+                <div class="form-row file-input">
+                    <label for="notas">Notas / Calificaciones (Opc.)</label>
+                    <input type="file"
+                           id="notas"
+                           name="notas"
+                           accept="application/pdf, image/png, image/jpeg">
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Información Familiar</legend>
+                <div class="form-row">
+                    <label for="estadoCivil">Estado Civil</label>
+                    <select id="estadoCivil"
+                            name="estadoCivil"
+                            required>
+                        <option value="Soltero">Soltero</option>
+                        <option value="Casado">Casado</option>
+                        <option value="Unión libre">Unión Libre</option>
+                    </select>
+                </div>
+
+                <div id="coyuge-docs"
+                     class="hidden-section">
+                    <h4>Documentos del Cónyuge</h4>
+                    <div class="form-row file-input">
+                        <label for="actaMatrimonio">Acta de Matrimonio</label>
+                        <input type="file"
+                               id="actaMatrimonio"
+                               name="actaMatrimonio"
+                               accept="application/pdf, image/png, image/jpeg">
+                    </div>
+                    <div class="form-row file-input">
+                        <label for="conyugePartidaNacimiento">Partida de Nacimiento de Cónyuge</label>
+                        <input type="file"
+                               id="conyugePartidaNacimiento"
+                               name="conyugePartidaNacimiento"
+                               accept="application/pdf, image/png, image/jpeg">
+                    </div>
+                    <div class="form-row file-input">
+                        <label for="conyugePasaporte">Pasaporte de Cónyuge</label>
+                        <input type="file"
+                               id="conyugePasaporte"
+                               name="conyugePasaporte"
+                               accept="application/pdf, image/png, image/jpeg">
+                    </div>
+                    <div class="form-row file-input">
+                        <label for="conyugeVisa">Visa de Cónyuge (Opc.)</label>
+                        <input type="file"
+                               id="conyugeVisa"
+                               name="conyugeVisa"
+                               accept="application/pdf, image/png, image/jpeg">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="tieneHijos">¿Tienes hijos?</label>
+                    <select id="tieneHijos"
+                            name="tieneHijos"
+                            required>
+                        <option value="No">No</option>
+                        <option value="Si">Sí</option>
+                    </select>
+                </div>
+
+                <div id="hijos-section"
+                     class="hidden-section">
+                    <h4>Información y Documentos de los Hijos</h4>
+                    <table id="hijos-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre completo del hijo</th>
+                                <th>Partida de Nacimiento (Opc.)</th>
+                                <th>Pasaporte (Opc.)</th>
+                                <th>Visa (Opc.)</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <button type="button"
+                            id="add-hijo-btn">Agregar Hijo</button>
+                </div>
+            </fieldset>
+
+            <div class="politicas-container">
+                <input type="checkbox"
+                       id="aceptoPoliticas"
+                       name="aceptoPoliticas"
+                       required>
+                <label for="aceptoPoliticas">
+                    He leído y acepto las <a
+                       href="https://drive.google.com/file/d/10kS169Ve4Lg1NeCLC1pGtqo359Mo17vA/view?usp=sharing"
+                       target="_blank"
+                       rel="noopener noreferrer">Políticas de Tratamiento de Datos</a>.
+                </label>
+            </div>
+            <div id="error-politicas"
+                 class="error-mensaje"></div>
+            <div id="status"></div>
+            <button type="submit"
+                    id="submit-btn">Enviar Formulario</button>
+        </form>
+    </div>
+
+    <table style="display:none;">
+        <tr id="hijo-template">
+            <td><input type="text"
+                       name="hijoNombre"
+                       class="hijo-nombre"
+                       required></td>
+            <td><input type="file"
+                       name="hijoPartidaNacimiento"
+                       accept="application/pdf, image/png, image/jpeg"></td>
+            <td><input type="file"
+                       name="hijoPasaporte"
+                       accept="application/pdf, image/png, image/jpeg"></td>
+            <td><input type="file"
+                       name="hijoVisa"
+                       accept="application/pdf, image/png, image/jpeg"></td>
+            <td><button type="button"
+                        class="remove-hijo-btn"
+                        onclick="removeHijo(this)">Eliminar</button></td>
+        </tr>
+    </table>
+
+    <?!= include('JavaScript'); ?>
+</body>
+
+</html>
